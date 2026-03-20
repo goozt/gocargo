@@ -19,6 +19,8 @@ package generate
 import (
 	"fmt"
 	"os"
+
+	"github.com/goozt/gocargo/internal/license"
 )
 
 const mainRsBody = `
@@ -74,7 +76,7 @@ func MainRs() error {
 		return fmt.Errorf("create src directory: %w", err)
 	}
 
-	content := mainRsBody
+	content := license.RsHeader + mainRsBody
 
 	if err := os.WriteFile(".gocargo/src/main.rs", []byte(content), 0o644); err != nil {
 		return fmt.Errorf("write main.rs: %w", err)
