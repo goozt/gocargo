@@ -14,10 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package cmd
 
-import "github.com/goozt/gocargo/cmd"
+import (
+	"fmt"
+	"os"
 
-func main() {
-	cmd.Execute()
+	"github.com/spf13/cobra"
+)
+
+var rootCmd = &cobra.Command{
+	Use:   "gocargo",
+	Short: "Package Go binaries for distribution via cargo install",
+	Long: `gocargo packages Go binaries into minimal Rust shim crates so that
+end-users can install them with a single "cargo install" command.
+
+The tool builds a static Go binary, generates a thin Rust wrapper that
+embeds the binary, and publishes the resulting crate to crates.io.`,
+}
+
+// Execute runs the root command.
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }

@@ -14,10 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package main
+package publish
 
-import "github.com/goozt/gocargo/cmd"
+import (
+	"fmt"
+	"os"
+	"os/exec"
+)
 
-func main() {
-	cmd.Execute()
+// CargoPublish runs `cargo publish` for the generated crate.
+// If token is non-empty it is passed via --token.
+func CargoPublish(token string) error {
+	if _, err := exec.LookPath("cargo"); err != nil {
+		return fmt.Errorf("cargo not found in PATH: %w", err)
+	}
+
+	args := []string{"publish", "--manifest-path", ".gocargo/Cargo.toml"}
+	if token != "" {
+		args = append(args, "--token", token)
+	}
+
+	cmd := exec.Command("cargo", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("cargo publish: %w", err)
+	}
+
+	return nil
 }
