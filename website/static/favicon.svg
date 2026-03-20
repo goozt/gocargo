@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADD8"/>
+      <stop offset="100%" style="stop-color:#007D9C"/>
+    </linearGradient>
+    <linearGradient id="crate" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5A623"/>
+      <stop offset="100%" style="stop-color:#D4880F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded background -->
+  <rect width="128" height="128" rx="20" ry="20" fill="url(#bg)"/>
+
+  <!-- Cargo crate (box shape) -->
+  <g transform="translate(64, 72)">
+    <!-- Crate front face -->
+    <polygon points="-28,0 0,-16 28,0 0,16" fill="url(#crate)" opacity="0.9"/>
+    <!-- Crate top face -->
+    <polygon points="-28,0 0,-16 0,-40 -28,-24" fill="#F7C068" opacity="0.9"/>
+    <!-- Crate right face -->
+    <polygon points="28,0 0,-16 0,-40 28,-24" fill="#D4880F" opacity="0.9"/>
+    <!-- Crate lines (wood slat details) -->
+    <line x1="-14" y1="-12" x2="-14" y2="-32" stroke="#C47A0D" stroke-width="1" opacity="0.4"/>
+    <line x1="14" y1="-12" x2="14" y2="-32" stroke="#A5690B" stroke-width="1" opacity="0.4"/>
+    <line x1="0" y1="-4" x2="0" y2="-40" stroke="#C47A0D" stroke-width="1.5" opacity="0.3"/>
+  </g>
+
+  <!-- Go gopher eye (stylized) - a nod to Go -->
+  <g transform="translate(64, 28)">
+    <!-- Gopher head silhouette (simplified) -->
+    <ellipse cx="0" cy="0" rx="16" ry="14" fill="white" opacity="0.95"/>
+    <!-- Eyes -->
+    <circle cx="-6" cy="-2" r="4.5" fill="white"/>
+    <circle cx="6" cy="-2" r="4.5" fill="white"/>
+    <circle cx="-6" cy="-2" r="2.5" fill="#333"/>
+    <circle cx="6" cy="-2" r="2.5" fill="#333"/>
+    <!-- Eye shine -->
+    <circle cx="-5" cy="-3" r="1" fill="white"/>
+    <circle cx="7" cy="-3" r="1" fill="white"/>
+    <!-- Nose -->
+    <ellipse cx="0" cy="4" rx="3" ry="2" fill="#E0D5C0"/>
+    <!-- Ears -->
+    <ellipse cx="-14" cy="-10" rx="5" ry="7" fill="white" opacity="0.9"/>
+    <ellipse cx="14" cy="-10" rx="5" ry="7" fill="white" opacity="0.9"/>
+    <ellipse cx="-14" cy="-10" rx="3" ry="5" fill="#FFB6C1" opacity="0.5"/>
+    <ellipse cx="14" cy="-10" rx="3" ry="5" fill="#FFB6C1" opacity="0.5"/>
+  </g>
+
+  <!-- Arrow pointing down from gopher into crate -->
+  <polygon points="64,48 58,44 61,44 61,42 67,42 67,44 70,44" fill="white" opacity="0.7"/>
+</svg>

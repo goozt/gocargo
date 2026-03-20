@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gocargo — Ship Go binaries via Cargo</title>
+  <meta name="description" content="Package Go binaries into Rust shim crates and distribute them via cargo install. One command to reach every Rust developer.">
+  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        <img src="static/favicon.svg" alt="gocargo" width="32" height="32">
+        <span>gocargo</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#install">Install</a>
+        <a href="#docs">Docs</a>
+        <a href="#contributing">Contribute</a>
+        <a href="https://github.com/goozt/gocargo" class="btn btn-sm">GitHub</a>
+      </div>
+      <button class="nav-toggle" aria-label="Toggle menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="container">
+      <h1>Ship Go binaries<br>via <span class="highlight">Cargo</span></h1>
+      <p class="hero-sub">
+        One command to package your Go CLI into a Rust shim crate.<br>
+        Your users install it with <code>cargo install your-tool</code>.
+      </p>
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary btn-lg">Get Started</a>
+        <a href="https://github.com/goozt/gocargo" class="btn btn-outline btn-lg">View on GitHub</a>
+      </div>
+      <div class="hero-code">
+        <pre><code><span class="c"># In your Go project root</span>
+gocargo publish --name my-tool --version 1.0.0 --summary "My awesome CLI"
+
+<span class="c"># Now anyone can install it</span>
+cargo install my-tool</code></pre>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2>Why gocargo?</h2>
+      <p class="section-sub">Reach the Rust ecosystem without rewriting a single line of Go.</p>
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">&#9889;</div>
+          <h3>One Command</h3>
+          <p>Run <code>gocargo publish</code> and you're done. No Rust knowledge required. No manual Cargo.toml editing.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128230;</div>
+          <h3>Tiny Shim</h3>
+          <p>The generated Rust wrapper is minimal. It embeds your Go binary and transparently proxies all arguments and I/O.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#127758;</div>
+          <h3>Cross-Platform</h3>
+          <p>Handles Unix permissions (<code>chmod 755</code>) and Windows <code>.exe</code> naming automatically. Build once, run everywhere.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128274;</div>
+          <h3>Static Binary</h3>
+          <p>Compiles with <code>CGO_ENABLED=0</code> and strips debug symbols. No external dependencies at runtime.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128273;</div>
+          <h3>Flexible Auth</h3>
+          <p>Pass tokens via <code>--token</code>, environment variables, or let gocargo read your <code>~/.cargo/credentials.toml</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128220;</div>
+          <h3>GPL-3.0 Licensed</h3>
+          <p>Free and open source. All generated files include proper license headers. Contributions welcome.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="section section-alt">
+    <div class="container">
+      <h2>How It Works</h2>
+      <p class="section-sub">From Go source to <code>cargo install</code> in four steps.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Build</h3>
+            <p>gocargo compiles your Go project into a small, static binary using <code>CGO_ENABLED=0 go build -ldflags="-s -w"</code>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Generate</h3>
+            <p>A minimal <code>Cargo.toml</code> and <code>src/main.rs</code> are created. The Rust shim uses <code>include_bytes!</code> to embed the Go binary at compile time.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Publish</h3>
+            <p>gocargo runs <code>cargo publish</code> to upload the crate to <a href="https://crates.io">crates.io</a>. Token authentication is handled automatically.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>Install</h3>
+            <p>End users run <code>cargo install your-tool</code>. The Rust shim extracts the Go binary to a temp file, sets permissions, and proxies execution transparently.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section id="install" class="section">
+    <div class="container">
+      <h2>Installation</h2>
+      <p class="section-sub">Choose your preferred method.</p>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Go Install</h3>
+          <p>If you have Go 1.18+ installed:</p>
+          <pre><code>go install github.com/goozt/gocargo@latest</code></pre>
+        </div>
+        <div class="card">
+          <h3>From Source</h3>
+          <p>Clone and build manually:</p>
+          <pre><code>git clone https://github.com/goozt/gocargo.git
+cd gocargo
+go build -o gocargo .</code></pre>
+        </div>
+        <div class="card">
+          <h3>GitHub Releases</h3>
+          <p>Download pre-built binaries for your platform from the <a href="https://github.com/goozt/gocargo/releases">releases page</a>. Available for Linux, macOS, Windows, FreeBSD, and more.</p>
+        </div>
+        <div class="card">
+          <h3>Prerequisites</h3>
+          <ul>
+            <li><strong>Go 1.18+</strong> &mdash; to build your project</li>
+            <li><strong>Cargo / Rust</strong> &mdash; to publish the crate</li>
+            <li>A <a href="https://crates.io">crates.io</a> account and API token</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Documentation -->
+  <section id="docs" class="section section-alt">
+    <div class="container">
+      <h2>Documentation</h2>
+      <p class="section-sub">Everything you need to ship your first crate.</p>
+
+      <div class="doc-block">
+        <h3>Quick Start</h3>
+        <pre><code><span class="c"># Navigate to your Go project</span>
+cd my-go-cli
+
+<span class="c"># Publish to crates.io</span>
+gocargo publish \
+  --name my-go-cli \
+  --version 1.0.0 \
+  --summary "A fast CLI tool written in Go"</code></pre>
+      </div>
+
+      <div class="doc-block">
+        <h3>CLI Reference</h3>
+        <table class="doc-table">
+          <thead>
+            <tr><th>Flag</th><th>Required</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>--name</code></td><td>Yes</td><td>Crate package name on crates.io</td></tr>
+            <tr><td><code>--version</code></td><td>Yes</td><td>Semantic version (e.g. <code>1.2.0</code>)</td></tr>
+            <tr><td><code>--summary</code></td><td>Yes</td><td>Short crate description</td></tr>
+            <tr><td><code>--token</code></td><td>No</td><td>Cargo registry API token</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="doc-block">
+        <h3>Authentication</h3>
+        <p>gocargo resolves your cargo registry token in this order:</p>
+        <ol>
+          <li><code>--token</code> CLI flag</li>
+          <li><code>GOCARGO_TOKEN</code> environment variable</li>
+          <li><code>CARGO_REGISTRY_TOKEN</code> environment variable</li>
+          <li><code>~/.cargo/credentials.toml</code> (automatic fallback)</li>
+        </ol>
+        <pre><code><span class="c"># Using an environment variable</span>
+export GOCARGO_TOKEN="cio_abc123..."
+gocargo publish --name my-tool --version 1.0.0 --summary "My tool"
+
+<span class="c"># Or pass it directly</span>
+gocargo publish --name my-tool --version 1.0.0 --summary "My tool" --token cio_abc123...</code></pre>
+      </div>
+
+      <div class="doc-block">
+        <h3>What Gets Generated</h3>
+        <p>gocargo creates a <code>.gocargo/</code> directory in your project root:</p>
+        <pre><code>.gocargo/
+├── Cargo.toml        # Crate manifest with size-optimized release profile
+├── bin/
+│   └── app_bin       # Static Go binary (CGO_ENABLED=0, stripped)
+└── src/
+    └── main.rs       # Rust shim: embeds binary, sets permissions, proxies execution</code></pre>
+        <p>This directory is listed in <code>.gitignore</code> and can be safely deleted at any time.</p>
+      </div>
+
+      <div class="doc-block">
+        <h3>Generated Rust Shim Behavior</h3>
+        <p>When an end user runs the installed binary, the Rust shim:</p>
+        <ol>
+          <li>Extracts the embedded Go binary to a unique temp file</li>
+          <li>Sets executable permissions on Unix (<code>chmod 755</code>)</li>
+          <li>Executes the binary, forwarding all arguments and stdio</li>
+          <li>Cleans up the temp file on exit</li>
+          <li>Exits with the same status code as the Go binary</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contributing -->
+  <section id="contributing" class="section">
+    <div class="container">
+      <h2>Contributing</h2>
+      <p class="section-sub">gocargo is open source and we welcome contributors of all experience levels.</p>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Getting Started</h3>
+          <ol>
+            <li>Fork the <a href="https://github.com/goozt/gocargo">repository</a></li>
+            <li>Clone your fork: <code>git clone https://github.com/YOUR_USER/gocargo.git</code></li>
+            <li>Create a branch: <code>git checkout -b my-feature</code></li>
+            <li>Make your changes and add tests</li>
+            <li>Run <code>go build ./...</code> and <code>go test ./...</code></li>
+            <li>Open a pull request</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Ways to Contribute</h3>
+          <ul>
+            <li>Report bugs and request features via <a href="https://github.com/goozt/gocargo/issues">GitHub Issues</a></li>
+            <li>Improve documentation and examples</li>
+            <li>Add support for additional registries</li>
+            <li>Add support for more target platforms</li>
+            <li>Write tests and improve code coverage</li>
+            <li>Review and test open pull requests</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Development Setup</h3>
+          <pre><code>git clone https://github.com/goozt/gocargo.git
+cd gocargo
+go mod download
+go build -o gocargo .
+./gocargo --help</code></pre>
+        </div>
+        <div class="card">
+          <h3>Code of Conduct</h3>
+          <p>We are committed to providing a welcoming and inclusive experience for everyone. Please be respectful and constructive in all interactions.</p>
+          <p>All contributions are subject to the <a href="https://github.com/goozt/gocargo/blob/main/LICENSE">GPL-3.0 license</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Changelog -->
+  <section id="changelog" class="section section-alt">
+    <div class="container">
+      <h2>Changelog</h2>
+      <p class="section-sub">Track what's new in each release. Full changelog on <a href="https://github.com/goozt/gocargo/blob/main/CHANGELOG.md">GitHub</a>.</p>
+
+      <div class="changelog-entry">
+        <div class="changelog-version">
+          <span class="badge">v0.1.0</span>
+          <span class="changelog-date">March 20, 2026</span>
+        </div>
+        <h3>Initial Release</h3>
+        <ul>
+          <li><code>publish</code> subcommand with <code>--name</code>, <code>--version</code>, <code>--summary</code>, <code>--token</code> flags</li>
+          <li>Static Go binary compilation with <code>CGO_ENABLED=0</code> and stripped symbols</li>
+          <li>Rust shim generation with <code>include_bytes!</code> embedding</li>
+          <li>Cross-platform support (Unix permissions + Windows <code>.exe</code>)</li>
+          <li>Multi-source token resolution (flag, env vars, credentials file)</li>
+          <li>Size-optimized Cargo release profile</li>
+          <li>GPL-3.0 license headers on all generated files</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img src="static/favicon.svg" alt="gocargo" width="24" height="24">
+          <span>gocargo</span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/goozt/gocargo">GitHub</a>
+          <a href="https://github.com/goozt/gocargo/issues">Issues</a>
+          <a href="https://github.com/goozt/gocargo/blob/main/LICENSE">License</a>
+          <a href="https://github.com/goozt/gocargo/blob/main/CHANGELOG.md">Changelog</a>
+        </div>
+        <p class="footer-copy">Released under the GPL-3.0 License. Built with Go and Rust.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav toggle
+    document.querySelector('.nav-toggle').addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          document.querySelector('.nav-links').classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
