@@ -1,0 +1,133 @@
+version: 2
+
+project_name: gocargo
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: gocargo
+    main: .
+    binary: gocargo
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X github.com/goozt/gocargo/internal/version.Version={{.Version}}
+      - -X github.com/goozt/gocargo/internal/version.Commit={{.ShortCommit}}
+      - -X github.com/goozt/gocargo/internal/version.Date={{.Date}}
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+      - openbsd
+      - netbsd
+    goarch:
+      - amd64
+      - arm64
+      - arm
+      - "386"
+      - ppc64le
+      - s390x
+      - mips64le
+      - riscv64
+    goarm:
+      - "6"
+      - "7"
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: ppc64le
+      - goos: windows
+        goarch: s390x
+      - goos: windows
+        goarch: mips64le
+      - goos: windows
+        goarch: riscv64
+      - goos: openbsd
+        goarch: ppc64le
+      - goos: openbsd
+        goarch: s390x
+      - goos: openbsd
+        goarch: mips64le
+      - goos: openbsd
+        goarch: riscv64
+      - goos: netbsd
+        goarch: ppc64le
+      - goos: netbsd
+        goarch: s390x
+      - goos: netbsd
+        goarch: mips64le
+      - goos: netbsd
+        goarch: riscv64
+      - goos: freebsd
+        goarch: ppc64le
+      - goos: freebsd
+        goarch: s390x
+      - goos: freebsd
+        goarch: mips64le
+      - goos: freebsd
+        goarch: riscv64
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^style:"
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: '🚀 Features'
+      regexp: "^feat:"
+      order: 0
+    - title: '🐛 Bug Fixes'
+      regexp: "^fix:"
+      order: 1
+    - title: '⚙️ Others'
+      order: 99
+
+release:
+  github:
+    owner: goozt
+    name: gocargo
+  draft: false
+  prerelease: auto
+  name_template: "v{{ .Version }}"
+  header: |
+    ## gocargo v{{ .Version }}
+
+    Package Go binaries into Rust shim crates for distribution via `cargo install`.
+  footer: |
+    **Full Changelog**: https://github.com/goozt/gocargo/compare/{{ .PreviousTag }}...{{ .Tag }}
