@@ -19,6 +19,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/goozt/gocargo/internal/auth"
 	"github.com/goozt/gocargo/internal/build"
@@ -32,6 +34,7 @@ var (
 	flagVersion string
 	flagSummary string
 	flagToken   string
+	buildSrc    string
 )
 
 var publishCmd = &cobra.Command{
@@ -47,9 +50,13 @@ var publishCmd = &cobra.Command{
 }
 
 func init() {
+	publishCmd.Flags().StringVar(&flagName, "n", "", "crate package name (required)")
 	publishCmd.Flags().StringVar(&flagName, "name", "", "crate package name (required)")
+	publishCmd.Flags().StringVar(&flagVersion, "v", "", "semver version (required)")
 	publishCmd.Flags().StringVar(&flagVersion, "version", "", "semver version (required)")
+	publishCmd.Flags().StringVar(&flagSummary, "s", "", "short crate description (required)")
 	publishCmd.Flags().StringVar(&flagSummary, "summary", "", "short crate description (required)")
+	publishCmd.Flags().StringVar(&flagToken, "t", "", "cargo registry token (optional)")
 	publishCmd.Flags().StringVar(&flagToken, "token", "", "cargo registry token (optional)")
 
 	_ = publishCmd.MarkFlagRequired("name")
@@ -59,7 +66,23 @@ func init() {
 	rootCmd.AddCommand(publishCmd)
 }
 
+func normaliseBuildSrc(src string) string {
+	src = strings.TrimSpace(src)
+	src = filepath.FromSlash(src)
+	src = filepath.Clean(src)
+	if src == "" {
+		return "."
+	}
+	return src
+}
+
 func runPublish(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		buildSrc = "."
+	} else {
+		buildSrc = normaliseBuildSrc(args[0])
+	}
+
 	// Clean previous build artifacts.
 	if err := os.RemoveAll(".gocargo"); err != nil {
 		return fmt.Errorf("clean .gocargo directory: %w", err)
@@ -70,7 +93,7 @@ func runPublish(cmd *cobra.Command, args []string) error {
 
 	// 2. Build the Go binary.
 	fmt.Println("=> Building Go binary...")
-	if err := build.GoBuild(); err != nil {
+	if err := build.GoBuild(buildSrc); err != nil {
 		return err
 	}
 

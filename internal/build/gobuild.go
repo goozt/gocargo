@@ -24,12 +24,12 @@ import (
 
 // GoBuild compiles the Go project in the current directory into a static binary
 // at .gocargo/bin/app_bin using CGO_ENABLED=0 and stripped symbols.
-func GoBuild() error {
+func GoBuild(buildSrc string) error {
 	if err := os.MkdirAll(".gocargo/bin", 0o755); err != nil {
 		return fmt.Errorf("create output directory: %w", err)
 	}
 
-	cmd := exec.Command("go", "build", "-ldflags=-s -w", "-o", ".gocargo/bin/app_bin", ".")
+	cmd := exec.Command("go", "build", "-ldflags=-s -w", "-o", ".gocargo/bin/app_bin", buildSrc)
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
