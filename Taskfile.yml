@@ -1,7 +1,10 @@
 version: "3"
 
+failfast: true
+set: [pipefail]
+
 vars:
-  NEXT_VERSION: '{{default "dev" .VERSION}}'
+  VERSION: '{{default "dev" .VERSION}}'
   COMMIT:
     sh: git rev-parse --short HEAD 2>/dev/null || echo "unknown"
   DATE:
@@ -15,6 +18,7 @@ vars:
 tasks:
   default:
     desc: Initialize development environment
+    concurrency: 4
     cmds:
       - go install github.com/gordonklaus/ineffassign@latest
       - go install github.com/client9/misspell/cmd/misspell@latest
@@ -54,8 +58,12 @@ tasks:
 
   release:
     desc: Create a new release in GitHub and trigger GoReleaser
-    deps:
-      - lint
+    silent: true
+    preconditions:
+      - sh: if [ "{{.VERSION}}" = "dev" ] || [ -z "{{.VERSION}}" ] ; then exit 1; fi;
+        msg: "VERSION not set. Usage: task release VERSION=1.2.3"
     cmds:
-      - git tag -a v{{.NEXT_VERSION}} -m "Release v{{.NEXT_VERSION}}"
-      - git push origin v{{.NEXT_VERSION}}
+      - task: lint
+      - git tag -a v{{.VERSION}} -m "Release v{{.VERSION}}"
+      - git push origin v{{.VERSION}}
+      - echo "Release v{{.VERSION}} created. GoReleaser will be triggered by GitHub Actions."
