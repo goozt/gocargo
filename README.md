@@ -28,7 +28,7 @@ Or build from source:
 ```sh
 git clone https://github.com/goozt/gocargo.git
 cd gocargo
-go build -o gocargo .
+task build VERSION=0.1.1
 ```
 
 ## Usage

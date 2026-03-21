@@ -292,18 +292,34 @@ go build -o gocargo .
 
       <div class="changelog-entry">
         <div class="changelog-version">
+          <span class="badge">v0.1.1</span>
+          <span class="tag">Latest</span>
+          <span class="changelog-date">March 21, 2026</span>
+        </div>
+        <h3>Bug Fixes &amp; Improvements</h3>
+        <ul>
+          <li>Added <code>Taskfile</code> with tasks for build automation, linting, testing, and release</li>
+          <li>Streamlined <code>release</code> task and improved version variable handling</li>
+          <li>Fixed <code>publish</code> command flags and normalized build source path cross-platform</li>
+        </ul>
+      </div>
+
+      <div class="changelog-entry">
+        <div class="changelog-version">
           <span class="badge">v0.1.0</span>
           <span class="changelog-date">March 20, 2026</span>
         </div>
         <h3>Initial Release</h3>
         <ul>
-          <li><code>publish</code> subcommand with <code>--name</code>, <code>--version</code>, <code>--summary</code>, <code>--token</code> flags</li>
+          <li>Added <code>publish</code> subcommand with <code>--name</code>, <code>--version</code>, <code>--summary</code>, <code>--token</code> flags</li>
           <li>Static Go binary compilation with <code>CGO_ENABLED=0</code> and stripped symbols</li>
           <li>Rust shim generation with <code>include_bytes!</code> embedding</li>
           <li>Cross-platform support (Unix permissions + Windows <code>.exe</code>)</li>
           <li>Multi-source token resolution (flag, env vars, credentials file)</li>
           <li>Size-optimized Cargo release profile</li>
           <li>GPL-3.0 license headers on all generated files</li>
+          <li>GitHub Actions workflow for release automation with GoReleaser</li>
+          <li>Build info injection (<code>version</code>, <code>commit</code>, <code>date</code>) via <code>ldflags</code></li>
         </ul>
       </div>
     </div>
