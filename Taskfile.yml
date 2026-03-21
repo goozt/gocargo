@@ -11,8 +11,6 @@ vars:
     -X github.com/goozt/gocargo/internal/version.Version={{.VERSION}}
     -X github.com/goozt/gocargo/internal/version.Commit={{.COMMIT}}
     -X github.com/goozt/gocargo/internal/version.Date={{.DATE}}
-  LATEST_TAG:
-    sh: git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"
 
 tasks:
   default:
@@ -53,3 +51,11 @@ tasks:
       - gocyclo -over 15 ./...
       - ineffassign ./...
       - misspell -error .
+
+  release:
+    desc: Create a new release in GitHub and trigger GoReleaser
+    deps:
+      - lint
+    cmds:
+      - git tag -a v{{.NEXT_VERSION}} -m "Release v{{.NEXT_VERSION}}"
+      - git push origin v{{.NEXT_VERSION}}
