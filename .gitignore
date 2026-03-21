@@ -43,3 +43,4 @@ target
 
 # Distribution files
 dist/
+bin/

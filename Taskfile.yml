@@ -1,0 +1,55 @@
+version: "3"
+
+vars:
+  NEXT_VERSION: '{{default "dev" .VERSION}}'
+  COMMIT:
+    sh: git rev-parse --short HEAD 2>/dev/null || echo "unknown"
+  DATE:
+    sh: date -u +%Y-%m-%dT%H:%M:%SZ
+  LDFLAGS: >-
+    -s -w
+    -X github.com/goozt/gocargo/internal/version.Version={{.VERSION}}
+    -X github.com/goozt/gocargo/internal/version.Commit={{.COMMIT}}
+    -X github.com/goozt/gocargo/internal/version.Date={{.DATE}}
+  LATEST_TAG:
+    sh: git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"
+
+tasks:
+  default:
+    desc: Initialize development environment
+    cmds:
+      - go install github.com/gordonklaus/ineffassign@latest
+      - go install github.com/client9/misspell/cmd/misspell@latest
+      - go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+      - go install github.com/go-task/task/v3/cmd/task@latest
+      - go install github.com/goreleaser/goreleaser/v2@latest
+
+  tidy:
+    desc: Tidy Go modules
+    cmds:
+      - go mod tidy
+
+  test:
+    desc: Run tests
+    deps:
+      - tidy
+    cmds:
+      - go test -timeout 120s ./...
+
+  build:
+    desc: Build both binaries
+    deps:
+      - test
+    cmds:
+      - go build -trimpath -ldflags="{{.LDFLAGS}}" -o bin/gocargo .
+
+  lint:
+    desc: Check if code is ready for version bump
+    deps:
+      - build
+    cmds:
+      - go vet ./...
+      - gofmt -l -s .
+      - gocyclo -over 15 ./...
+      - ineffassign ./...
+      - misspell -error .
